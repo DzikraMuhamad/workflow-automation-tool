@@ -60,18 +60,24 @@ export default function ClientRequestPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: user.name, email: user.email, issue }),
+          body: JSON.stringify({
+            name: user.name,
+            email: user.email,
+            issue: issue.trim(), // Pastikan tidak ada whitespace berlebih
+          }),
         }
       );
 
       if (response.ok) {
-        setIssue("");
-        fetchRequests(user.email);
+        setIssue(""); // Reset form setelah sukses
+        fetchRequests(user.email); // Refresh data
+        console.log("✅ Request berhasil dikirim ke Django & Webhook");
       } else {
-        console.error("Failed to submit request");
+        const errorResponse = await response.json();
+        console.error("❌ Gagal mengirim request:", errorResponse);
       }
     } catch (error) {
-      console.error("Error submitting request:", error);
+      console.error("❌ Error submitting request:", error);
     }
   };
 
