@@ -1,0 +1,70 @@
+.navbar {
+  width: 100vw;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #a62727;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  &__logo {
+    width: 50px;
+    height: 50px;
+    padding-left: 30px;
+  }
+
+  &__rightSection {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-right: 70px;
+    &__search {
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    &__profile {
+      position: relative;
+      cursor: pointer;
+
+      &Image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    color: black;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 5px 10px;
+    white-space: nowrap;
+
+    button {
+      background: none;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: black;
+      width: 100%;
+      text-align: left;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+  }
+}

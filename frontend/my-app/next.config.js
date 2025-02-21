@@ -1,4 +1,5 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   async rewrites() {
     return [
       {
@@ -6,6 +7,9 @@ module.exports = {
         destination: "http://127.0.0.1:8000/api/client-requests/:path*",
       },
     ];
+  },
+  images: {
+    domains: ["lh3.googleusercontent.com"],
   },
   async headers() {
     return [
@@ -29,3 +33,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;
