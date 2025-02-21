@@ -1,0 +1,95 @@
+.container {
+  max-width: 70%;
+  margin: 100px auto;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background: #a62727;
+      color: white;
+      text-transform: uppercase;
+      width: 30%;
+    }
+
+    td {
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    &__status {
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    &__actionButtons {
+      display: flex;
+      gap: 10px;
+    }
+
+    &__editButton {
+      padding: 8px 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      background-color: #ffc107;
+      color: black;
+      transition: all 0.3s ease-in-out;
+      margin-right: 8px;
+
+      &:hover {
+        background-color: #e0a800;
+      }
+    }
+
+    &__deleteButton {
+      padding: 8px 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      background-color: #dc3545;
+      color: white;
+      transition: all 0.3s ease-in-out;
+
+      &:hover {
+        background-color: #c82333;
+      }
+    }
+    &__backButton {
+      background-color: #6c757d;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      &:hover {
+        background-color: #5a6268;
+      }
+    }
+  }
+}

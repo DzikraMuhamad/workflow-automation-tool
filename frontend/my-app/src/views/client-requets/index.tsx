@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { auth, onAuthStateChanged } from "../../../firebase";
 import styles from "./client-requests.module.scss";
+import Link from "next/link";
 
 interface ClientRequest {
   id: number;
@@ -125,21 +126,20 @@ const ClientRequestView = () => {
         <h2>Your Requests</h2>
         <div className={styles.body__requestContainer}>
           {requests.map((req) => (
-            <div
-              key={req.id}
-              className={styles.body__requestContainer__requestCard}
-            >
-              <p>
-                <strong>Issue:</strong> {req.issue}
-              </p>
-              <p>
-                <strong>Status:</strong> {req.status}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(req.created_at).toLocaleString()}
-              </p>
-            </div>
+            <Link key={req.id} href={`/client-requests/${req.id}`} passHref>
+              <div className={styles.body__requestContainer__requestCard}>
+                <p>
+                  <strong>Issue:</strong> {req.issue}
+                </p>
+                <p>
+                  <strong>Status:</strong> {req.status}
+                </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(req.created_at).toLocaleString()}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
