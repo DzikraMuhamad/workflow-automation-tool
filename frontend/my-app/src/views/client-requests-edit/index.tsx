@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { auth, onAuthStateChanged } from "../../../firebase"; // Import Firebase Auth
 import styles from "../client-requests-detail/client-request-detail.module.scss";
 
 interface ClientRequest {
@@ -14,27 +15,49 @@ interface ClientRequest {
 const ClientRequestEditView = () => {
   const router = useRouter();
   const { id } = router.query;
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
   const [request, setRequest] = useState<ClientRequest | null>(null);
   const [issue, setIssue] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          name: currentUser.displayName || "",
+          email: currentUser.email || "",
+        });
+      } else {
+        router.push("/login");
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    if (!id || !user) return;
 
     fetch(`http://localhost:8000/api/client-requests/${id}/`)
       .then((res) => res.json())
       .then((data) => {
-        setRequest(data);
-        setIssue(data.issue); // Isi state issue dengan data awal
+        if (data.email !== user.email) {
+          alert("You are not authorized to edit this request.");
+          router.push("/client-requests");
+        } else {
+          setRequest(data);
+          setIssue(data.issue);
+        }
       })
       .catch((err) => console.error("Failed to fetch request:", err));
-  }, [id]);
+  }, [id, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!request) return; // Pastikan request sudah ter-load
-
-    console.log("Sending update request:", { id, issue });
+    if (!request) return;
 
     try {
       const response = await fetch(
@@ -52,21 +75,19 @@ const ClientRequestEditView = () => {
       );
 
       if (response.ok) {
-        console.log("✅ Update success!");
         alert("Issue updated successfully!");
         router.push(`/client-requests/${id}`);
       } else {
         const errorText = await response.text();
-        console.error("❌ Failed to update issue:", errorText);
         alert(`Failed to update: ${errorText}`);
       }
     } catch (error) {
-      console.error("❌ Error updating issue:", error);
+      console.error("Something went wrong while updating:", error);
       alert("Something went wrong while updating.");
     }
   };
 
-  if (!request) return <p>Loading...</p>;
+  if (loading || !request) return <p>Loading...</p>;
 
   return (
     <div className={styles.container}>

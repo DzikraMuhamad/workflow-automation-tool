@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { auth, onAuthStateChanged } from "../../../firebase";
 import styles from "./client-request-detail.module.scss";
 import Link from "next/link";
 
@@ -14,21 +15,39 @@ interface ClientRequest {
 
 const ClientRequestDetailView = () => {
   const router = useRouter();
-  const { id } = router.query; // Tangkap ID dari URL
+  const { id } = router.query;
+  const [user, setUser] = useState<{ name: string; email: string } | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
   const [request, setRequest] = useState<ClientRequest | null>(null);
 
   useEffect(() => {
-    if (!id) return; // Jangan fetch kalau id masih undefined
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser({
+          name: currentUser.displayName || "",
+          email: currentUser.email || "",
+        });
+      } else {
+        router.push("/login");
+      }
+      setLoading(false);
+    });
 
-    console.log("Router Query ID:", id); // Debugging
+    return () => unsubscribe();
+  }, [router]);
+
+  useEffect(() => {
+    if (!id || !user) return;
+
     fetch(`http://localhost:8000/api/client-requests/${id}/`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Fetched Data:", data);
         setRequest(data);
       })
       .catch((err) => console.error("Failed to fetch request:", err));
-  }, [id]);
+  }, [id, user]);
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this request?")) return;
@@ -43,14 +62,15 @@ const ClientRequestDetailView = () => {
         alert("Request deleted successfully!");
         router.push("/client-requests");
       } else {
-        console.error("❌ Failed to delete request:", await response.json());
+        console.error("Failed to delete request:", await response.json());
       }
     } catch (error) {
-      console.error("❌ Error deleting request:", error);
+      console.error("Error deleting request:", error);
     }
   };
 
-  if (!request) return <p>Loading...</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!request) return <p>Loading request data...</p>;
 
   return (
     <div className={styles.container}>
