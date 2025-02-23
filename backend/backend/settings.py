@@ -90,7 +90,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'workflow_automation',
         'USER': 'postgres',
-        'PASSWORD': 'Bismillah110303',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '5433',
     }
