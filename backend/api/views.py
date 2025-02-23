@@ -1,25 +1,80 @@
 import requests
 import logging
 from rest_framework import generics
+from django.core.mail import send_mail
+from django.conf import settings
 from .models import ClientRequest
 from .serializers import ClientRequestSerializer
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-# Logging untuk debugging
+
 logger = logging.getLogger(__name__)
 
-# URL Webhook dari Make.com
-MAKE_WEBHOOK_URL = "https://hook.eu2.make.com/c8c2cgzcw0dc5dx74xyt9ww5vwyrcrja"
+MAKE_WEBHOOK_URL = "https://hook.eu2.make.com/l4g1ictm3yyft7s904r7lgxcp0mh59mw"
 
-# Fungsi untuk mengirim data ke Make Webhook
 def send_to_make_webhook(payload):
     try:
         response = requests.post(MAKE_WEBHOOK_URL, json=payload)
-        response.raise_for_status()  # Raise error jika status code bukan 2xx
+        response.raise_for_status()  
         logger.info(f"Webhook success: {response.status_code}")
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to send data to Make: {e}")
 
-# ✅ View untuk menampilkan daftar & membuat ClientRequest
+def send_completion_email(email, name, issue):
+    """Mengirim email ke klien saat status berubah menjadi 'done'"""
+    subject = "Your Request Has Been Completed!"
+    message = f"""
+    Hi {name},
+
+    Your request regarding "{issue}" has been marked as DONE. 
+    If you need further assistance, feel free to reach out.
+
+    Best regards,
+    Your Support Team
+    """
+    
+    try:
+        send_mail(
+            subject, 
+            message, 
+            settings.DEFAULT_FROM_EMAIL, 
+            [email], 
+            fail_silently=False 
+        )
+        logger.info(f"Email sent successfully to {email}")
+    except Exception as e:
+        logger.error(f"Failed to send email to {email}: {e}")
+
+@csrf_exempt
+def update_status_from_make(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            request_id = data.get("id")
+            new_status = data.get("status")
+
+            if request_id and new_status:
+                try:
+                    client_request = ClientRequest.objects.get(id=request_id)
+                    client_request.status = new_status
+                    client_request.save()
+                    
+                    if new_status.lower() == "done":
+                        send_completion_email(client_request.email, client_request.name, client_request.issue)
+                    
+                    return JsonResponse({"message": "Status updated successfully"}, status=200)
+                except ClientRequest.DoesNotExist:
+                    return JsonResponse({"error": "Client request not found"}, status=404)
+            else:
+                return JsonResponse({"error": "Missing 'id' or 'status'"}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
 class ClientRequestListCreateView(generics.ListCreateAPIView):
     queryset = ClientRequest.objects.all()
     serializer_class = ClientRequestSerializer
@@ -27,7 +82,6 @@ class ClientRequestListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         client_request = serializer.save()
 
-        # Kirim data ke Make Webhook (CREATE)
         payload = {
             "action": "create",
             "id": client_request.id,
@@ -40,7 +94,6 @@ class ClientRequestListCreateView(generics.ListCreateAPIView):
 
         send_to_make_webhook(payload)
 
-# ✅ View untuk menampilkan, mengupdate, dan menghapus ClientRequest
 class ClientRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ClientRequest.objects.all()
     serializer_class = ClientRequestSerializer
@@ -48,7 +101,6 @@ class ClientRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         client_request = serializer.save()
 
-        # Kirim data ke Make Webhook (UPDATE)
         payload = {
             "action": "update",
             "id": client_request.id,
@@ -60,8 +112,10 @@ class ClientRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         send_to_make_webhook(payload)
 
+        if client_request.status.lower() == "done":
+            send_completion_email(client_request.email, client_request.name, client_request.issue)
+
     def perform_destroy(self, instance):
-        # Kirim data ke Make Webhook (DELETE)
         payload = {
             "action": "delete",
             "id": instance.id,
@@ -72,6 +126,4 @@ class ClientRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
         }
 
         send_to_make_webhook(payload)
-
-        # Hapus dari database setelah webhook sukses
         super().perform_destroy(instance)

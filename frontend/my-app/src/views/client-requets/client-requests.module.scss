@@ -6,24 +6,56 @@
 }
 .background {
   margin-top: 51px;
-  height: 400px;
+  height: 500px;
   width: 100%;
-  border-radius: 40px;
 }
-.form {
+.helloFromRobot {
+  position: absolute;
+  top: 250px;
+  left: 50px;
+  width: 300px;
+  height: auto;
+}
+.speechBubble {
   position: absolute;
   top: 150px;
+  left: 150px;
+  width: 250px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    left: 20%;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #fff;
+  }
+}
+
+.form {
+  position: absolute;
+  top: 200px;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
-  background: white;
+  width: 60%;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  color: white;
   &__formRow {
     display: flex;
     align-items: center;
@@ -34,28 +66,33 @@
       display: flex;
       flex-direction: column;
       flex: 1;
+      color: white;
       label {
         font-weight: bold;
         margin-bottom: 5px;
+        color: white;
       }
       input {
         padding: 8px;
-        border: 1px solid #ccc;
+        border: 1px solid #6e6e6e;
         border-radius: 5px;
       }
     }
+  }
+  &__submitButton {
+    max-width: 400px;
+    display: block;
+    margin: 20px auto 0 auto;
+    text-align: center;
+    background: blue;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
 
-    &__submitButton {
-      background: blue;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-
-      &:hover {
-        background: darkblue;
-      }
+    &:hover {
+      background: darkblue;
     }
   }
 }
@@ -68,7 +105,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 15px;
-    padding: 30px 10px; // Tambah padding agar tidak menempel ke form
+    padding: 30px 10px;
 
     &__requestCard {
       background: white;
@@ -80,7 +117,6 @@
       text-align: left;
       font-size: 16px;
       color: black;
-      text-decoration: none;
       &:hover {
         transform: scale(1.05);
       }
@@ -92,7 +128,6 @@
   }
 }
 
-/* Responsiveness */
 @media (max-width: 600px) {
   .form {
     width: 90%;

@@ -1,8 +1,10 @@
 .loginPage {
   display: flex;
   align-items: center;
+  justify-content: center;
+  height: 100vh;
   &__image {
-    width: 720px;
+    width: 600px;
     height: 720px;
   }
   &__rightContent {
@@ -18,7 +20,7 @@
       background-color: white;
       border: grey 1px solid;
       padding: 5px 30px;
-      margin-top: 100px;
+      margin-top: 50px;
       &__google {
         width: 30px;
         height: 30px;

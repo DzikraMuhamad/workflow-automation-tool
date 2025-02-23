@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { auth, onAuthStateChanged } from "../../../firebase"; // Import Firebase Auth
+import { auth, onAuthStateChanged } from "../../../firebase";
 import styles from "../client-requests-detail/client-request-detail.module.scss";
 
 interface ClientRequest {

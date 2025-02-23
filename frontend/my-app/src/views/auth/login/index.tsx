@@ -38,7 +38,11 @@ export default function Login() {
         <h1 className={styles.loginAccepts}>Welcome, {user.displayName}</h1>
       ) : (
         <div className={styles.loginPage}>
-          <img src="baymax.png" alt="" className={styles.loginPage__image} />
+          <img
+            src="hello_from_robot.png"
+            alt=""
+            className={styles.loginPage__image}
+          />
           <div className={styles.loginPage__rightContent}>
             <h1>Selamat Datang di Website Client Request</h1>
             <button

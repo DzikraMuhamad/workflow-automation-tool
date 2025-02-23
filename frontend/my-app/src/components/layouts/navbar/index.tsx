@@ -29,7 +29,7 @@ const Navbar = () => {
     <nav className={styles.navbar}>
       <div>
         <img
-          src="/baymax-logo.png"
+          src="fly_robot.png"
           alt="Baymax"
           className={styles["navbar__logo"]}
         />

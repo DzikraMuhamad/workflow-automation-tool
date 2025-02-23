@@ -46,7 +46,6 @@ const ClientRequestView = () => {
       );
       const data: ClientRequest[] = await response.json();
       const userRequests = data.filter((req) => req.email === email);
-      // Urutkan berdasarkan tanggal terbaru
       userRequests.sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -78,20 +77,44 @@ const ClientRequestView = () => {
       if (response.ok) {
         setIssue("");
         fetchRequests(user.email);
-        console.log("✅ Request berhasil dikirim ke Django & Webhook");
+        console.log("Request berhasil dikirim ke Django & Webhook");
       } else {
-        console.error("❌ Gagal mengirim request:", await response.json());
+        console.error("Gagal mengirim request:", await response.json());
       }
     } catch (error) {
-      console.error("❌ Error submitting request:", error);
+      console.error("Error submitting request:", error);
     }
+  };
+
+  // 🔹 Fungsi untuk memotong teks Issue setelah 3 kata
+  const truncateText = (text: string, wordLimit: number) => {
+    const words = text.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : text;
   };
 
   if (loading) return <p>Loading...</p>;
 
   return (
     <div className={styles.container}>
-      <img src="bg.png" alt="Gambar" className={styles.background} />
+      <img
+        src="background_blue.png"
+        alt="Gambar"
+        className={styles.background}
+      />
+      <div className={styles.speechBubble}>
+        <p>
+          Selamat datang di website kami, kami bersedia menerima semua request
+          dari Anda.
+        </p>
+      </div>
+      <img
+        src="hello_from_robot.png"
+        alt=""
+        className={styles.helloFromRobot}
+      />
+
       {user && (
         <form onSubmit={handleSubmit} className={styles.form}>
           <h1>Client Request</h1>
@@ -113,15 +136,13 @@ const ClientRequestView = () => {
                 required
               />
             </div>
-            <button
-              type="submit"
-              className={styles.form__formRow__submitButton}
-            >
-              Submit
-            </button>
           </div>
+          <button type="submit" className={styles.form__submitButton}>
+            Send Request
+          </button>
         </form>
       )}
+
       <div className={styles.body}>
         <h2>Your Requests</h2>
         <div className={styles.body__requestContainer}>
@@ -129,7 +150,7 @@ const ClientRequestView = () => {
             <Link key={req.id} href={`/client-requests/${req.id}`} passHref>
               <div className={styles.body__requestContainer__requestCard}>
                 <p>
-                  <strong>Issue:</strong> {req.issue}
+                  <strong>Issue:</strong> {truncateText(req.issue, 3)}
                 </p>
                 <p>
                   <strong>Status:</strong> {req.status}
